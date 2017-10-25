@@ -5,44 +5,65 @@ library(assertthat)
 library(lubridate)
 library(tidyr)
 
-data_folder <- "data/raw"
-raw_files <- dir(data_folder)
 
-df <- read.csv(paste(data_folder, "/2016_01_01_24mq.csv", sep = ""),
-               sep = ";", row.names = NULL)
-
-# move header to left and remove last column 
-if (!is.na(colnames(df)[26])) {
-  colnames(df) <-
-    colnames(df) %>% 
-    tail(-1)
-  assert_that(df %>% select(26) %>% is.na %>% all)
+process_df <- function(df) {
+  # shift header left and remove last column 
+  if (!is.na(colnames(df)[26])) {
+    colnames(df) <-
+      colnames(df) %>% 
+      tail(-1)
+    assert_that(df %>% select(26) %>% is.na %>% all)
+    df <-
+      df %>%
+      select(-26)
+  }
+  
+  # DATE
+  # identify date from first column lable
+  date <-
+    df %>%
+    colnames %>%
+    .[1] %>%
+    ymd(.)
+  # add date to new column
+  df <- 
+    df %>%
+    mutate(date = date)
+  # rename first header to 'location'
+  colnames(df)[1] <- "location"
+  
+  # TIME
+  # wide to long format
   df <-
     df %>%
-    select(-26)
+    gather(hour, count, -location, -date) %>%
+    # 'hour' to integer format
+    mutate(hour = substring(hour, 2)) %>% 
+    mutate(hour = as.integer(hour))
+
+  return(df)
 }
 
-# DATE
-# identify date from first column lable
-date <-
-  df %>%
-  colnames %>%
-  .[1] %>%
-  strsplit("\\.") %>%
-  .[[1]] %>%
-  last %>%
-  ymd(.)
-# add date to new column
-df <- 
-  df %>%
-  mutate(date = date)
-# rename first header to 'location'
-colnames(df)[1] <- "location"
+# get all files
+data_folder <- "data/raw/"
+raw_files <- dir(data_folder)
 
-# TIME
-# wide to long format
-df <-
-  df %>%
-  gather(hour, count, -location, -date)
-# 'hour' to integer format
-# TODO
+# define dataframe to fill with data
+df_target <- data.frame(location = as.character(),
+                        date = as.character(),
+                        hour = as.integer(),
+                        count = as.integer())
+
+# EACH source file: read, preprocess, add to 'df_target'
+for (raw_file in raw_files) {
+  print(paste("reading ", raw_file))
+  df_source <- 
+    read.csv(paste(data_folder, raw_file, sep = ""),
+             sep = ";", row.names = NULL) %>%
+    process_df()
+  
+  df_target <- rbind(df_target, df_source)
+}
+
+# write 'df_target' to file
+write.csv(df_target, file = "data/processed/kfz-data.csv")

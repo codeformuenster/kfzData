@@ -1,2 +1,6 @@
 *.Rproj.user
 *.Rproj
+.Rproj.user
+
+# processed data
+data/processed/*
