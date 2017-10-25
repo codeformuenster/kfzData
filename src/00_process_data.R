@@ -4,6 +4,8 @@ library(dplyr)
 library(assertthat)
 library(lubridate)
 library(tidyr)
+library(DBI)
+library(RSQLite)
 
 
 process_df <- function(df) {
@@ -28,7 +30,7 @@ process_df <- function(df) {
   # add date to new column
   df <- 
     df %>%
-    mutate(date = date)
+    mutate(date = as.character(date))
   # rename first header to 'location'
   colnames(df)[1] <- "location"
   
@@ -65,5 +67,7 @@ for (raw_file in raw_files) {
   df_target <- rbind(df_target, df_source)
 }
 
-# write 'df_target' to file
-write.csv(df_target, file = "data/processed/kfz-data.csv")
+# write 'df_target' to SQLite database
+con <- dbConnect(SQLite(), dbname="data/processed/kfz_data.sqlite")
+dbWriteTable(con, "kfz_data", df_target, overwrite = T)
+dbDisconnect(con)
