@@ -17,10 +17,6 @@ wolbecker <-
          WHERE location LIKE '%09040%'", 
          dbname = "data/processed/kfz_data.sqlite") 
 
-
-locations <- wolbecker$location %>% unique()
-
-
 # PLOTS
 # plot aggregated days over year
 wolbecker %>%
