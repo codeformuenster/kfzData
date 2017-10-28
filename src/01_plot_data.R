@@ -4,6 +4,7 @@ library(RSQLite)
 library(sqldf)
 library(dplyr)
 library(ggplot2)
+library(gridExtra)
 
 # LOAD DATA
 wolbecker <- 
@@ -17,18 +18,37 @@ wolbecker <-
          WHERE location LIKE '%09040%'", 
          dbname = "data/processed/kfz_data.sqlite") 
 
-# PLOTS
+# GROUPED PLOTS
 # plot aggregated days over year
 wolbecker %>%
   group_by(direction, date) %>%
   summarise(count_day = sum(count)) %>%
   ggplot(data = ., aes(x = date, y = count_day)) +
-  geom_line(aes(group = direction, color = direction))
+  geom_line(aes(group = direction, color = direction)) +
+  theme_minimal()
 
 # plot days as line plot
 wolbecker %>%
   ggplot(data = ., aes(x = hour, y = count)) +
   geom_line(aes(group = interaction(date, direction), color = direction),
-            alpha = .3)
+            alpha = .2) +
+  theme_minimal()
   
+# UN-GROUPED PLOTS
+# plot aggregated days over year
+wolbecker %>%
+  group_by(date) %>%
+  summarise(count_day = sum(count)) %>%
+  ggplot(data = ., aes(x = date, y = count_day)) +
+  geom_line(group = 1) +
+  theme_minimal()
+
+# plot days as line plot
+wolbecker %>%
+  group_by(date, hour) %>%
+  summarise(count_sum = sum(count)) %>%
+  ggplot(data = ., aes(x = hour, y = count_sum)) +
+  geom_line(aes(group = date),
+            alpha = .2) +
+  theme_minimal()
   
