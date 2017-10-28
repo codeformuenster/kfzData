@@ -50,24 +50,21 @@ process_df <- function(df) {
 data_folder <- "data/raw/"
 raw_files <- dir(data_folder)
 
-# define dataframe to fill with data
-df_target <- data.frame(location = as.character(),
-                        date = as.character(),
-                        hour = as.integer(),
-                        count = as.integer())
+# connect to database and remove existing table, if exists
+con <- dbConnect(SQLite(), dbname = "data/processed/kfz_data.sqlite")
+if (dbExistsTable(con, "kfz_data")) { dbRemoveTable(con, "kfz_data") }
 
 # EACH source file: read, preprocess, add to 'df_target'
 for (raw_file in raw_files) {
-  print(paste("reading ", raw_file))
+  print(paste("processing ", raw_file))
   df_source <- 
     read.csv(paste(data_folder, raw_file, sep = ""),
              sep = ";", row.names = NULL) %>%
     process_df()
   
-  df_target <- rbind(df_target, df_source)
+  # write 'df_source' to SQLite database
+  dbWriteTable(con, "kfz_data", df_source, 
+               append = T, row.names = F, overwrite = F)
 }
 
-# write 'df_target' to SQLite database
-con <- dbConnect(SQLite(), dbname="data/processed/kfz_data.sqlite")
-dbWriteTable(con, "kfz_data", df_target, overwrite = T)
 dbDisconnect(con)
