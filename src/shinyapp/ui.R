@@ -15,24 +15,33 @@
 
 library(shiny)
 
-# Define UI for miles per gallon application
-shinyUI(pageWithSidebar(
+shinyUI(
+  fluidPage(title = "Anzahl Autos auf der Wolbecker Straße",
   
-  # Application title
-  headerPanel("Cars on 'Wolbecker Str.'"),
-  
-  sidebarPanel(
-    selectInput("scale", "Time scale:",
-                list("Year" = "year",
-                     "Day" = "day")),
-    
-    checkboxInput("grouping", "Group by direction")
+  sidebarLayout(
+    sidebarPanel(
+      dateRangeInput("date_range", 
+        "Wähle eine Zeitspanne:", 
+        min = "2015-01-01", max = "2016-12-31", 
+        start = "2015-01-01", end = "2015-12-31",
+        format = "dd. MM yyyy", language = "de"),
+          sliderInput("hour_range", 
+                "Wähle eine Zeitspanne:", 
+                min = 0, max = 24, 
+                value = c(0, 24))
+    ),
+    mainPanel(
+      
+      h3(textOutput("caption")),
+      
+      plotOutput("plotYear"),
+      plotOutput("plotDay")
+    ),
   ),
   
-  mainPanel(
-    
-    h3(textOutput("caption")),
-    
-    plotOutput("plot")
-  )
+  hr(),
+  print("lizenziert unter der GPLv3,"),
+  a("mehr Infos hier", href="https://github.com/codeformuenster/kfzData#rechtliches"),
+  HTML("<br>"),
+  print("Datenquelle: Stadt Münster (lizenziert unter Datenlizenz Deutschland - Namensnennung - Version 2.0)")
 ))

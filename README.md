@@ -1,3 +1,5 @@
+TODO: eine genauere Anleitung, was hier passiert und wie man es reproduzieren kann
+
 ## Format der Kfz-Zähldaten
 
 ```
@@ -10,7 +12,7 @@ FV heißt Fahrverkehr, entspricht einer "Straßenseite"
 Richtung: G / L / R für Geradeaus-, Links-, oder Rechtsabbieger-spur
 gesamtes Verkehrsaufkommen für eine Fahrrichtung ist dann die Summe von G / L / R
 
-Notizen / Ideen:
+### Notizen / Ideen:
 
 - Daten sind nicht "kontrolliert" -> es kann gut sein, dass manche Zählschleifen nicht funktionieren oder manche Zählschleifen vertauscht sind. 
 - Gibt es mehr Verkehr auf dem Albersloher Weg wegen Autobahnanschluss Hiltrup?
@@ -18,7 +20,7 @@ Notizen / Ideen:
 - Münster ist Kfz-verkehrsmäßig am Limit, 3-4 % mehr Autos und es gibt Stau (z.B. bei schlechtem Wetter)
 - Radverkehrsplanung ist Schönwetterplanung
 
-## Rechtliches:
+## Rechtliches
 
 ### Quelltext
 
@@ -53,4 +55,5 @@ Programm erhalten haben](COPYING). Wenn nicht, siehe <http://www.gnu.org/license
 ### Daten
 
 Datenquelle: Stadt Münster
+
 [Datenlizenz Deutschland – Namensnennung – Version 2.0](http://www.govdata.de/dl-de/by-2-0) (oder [diese pdf-Datei](doc/Stadt_MS_OpenData_Datenlizenz_Deutschland.pdf))
